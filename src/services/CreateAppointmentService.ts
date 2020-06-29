@@ -16,6 +16,9 @@ interface RequestDTO {
 
 /**
  * Dependency Inversion (SOLID)
+ *
+ * Single Responsability Principle
+ * Dependency Invertion Principle
  */
 
 class CreateAppointmentService {
