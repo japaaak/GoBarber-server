@@ -1,52 +1,44 @@
-//Responsavel somente para criacao
-import { startOfHour } from 'date-fns';
+// ./src/services/CreateAppointmentService.ts
 
-import Appointment from '../models/Appointment';
+import { startOfHour } from 'date-fns';
+import { getCustomRepository } from 'typeorm';
+
+import AppError from '../errors/AppError';
+
 import AppointmentsRepository from '../repositories/AppointmentsRepository';
-/**
- * [x] Recebimento das informacoes
- * [x] Tratativa de erros/excessoes
- * [x] Acesso ao repositorio
- */
+import Appointment from '../models/Appointment';
 
 interface RequestDTO {
-    provider: string;
-    date: Date;
+  provider_id: string;
+  date: Date;
 }
-
-/**
- * Dependency Inversion (SOLID)
- *
- * Single Responsability Principle
- * Dependency Invertion Principle
- */
 
 class CreateAppointmentService {
-    private appointmentsRepository: AppointmentsRepository;
+  public async execute({
+    date,
+    provider_id,
+  }: RequestDTO): Promise<Appointment> {
+    const appointmentsRepository = getCustomRepository(AppointmentsRepository);
 
-    constructor(appointmentsRepository: AppointmentsRepository) {
-        this.appointmentsRepository = appointmentsRepository;
+    const appointmentDate = startOfHour(date);
+
+    const findAppointmentInSameDate = await appointmentsRepository.findByDate(
+      appointmentDate,
+    );
+
+    if (findAppointmentInSameDate) {
+      throw new AppError('This appointment is already booked');
     }
 
-    public execute({ date, provider }: RequestDTO): Appointment {
-        const appointmentDate = startOfHour(date);
+    const appointment = appointmentsRepository.create({
+      provider_id,
+      date: appointmentDate,
+    });
 
-        const findAppointmentInSameDate = this.appointmentsRepository.findByDate(
-            appointmentDate,
-        );
+    await appointmentsRepository.save(appointment);
 
-        if (findAppointmentInSameDate) {
-            throw Error ('This appointment is already booked');
-        }
-
-        const appointment = this.appointmentsRepository.create({
-            provider,
-            date: appointmentDate,
-        });
-
-        return appointment;
-    }
+    return appointment;
+  }
 }
-
 
 export default CreateAppointmentService;
