@@ -1,4 +1,4 @@
-// ./src/models/Appointment.ts
+// src\modules\appointments\infra\typeorm\entities\Appointment.ts
 
 import {
   Entity,
@@ -8,6 +8,7 @@ import {
   UpdateDateColumn,
   ManyToOne,
   JoinColumn,
+  ManyToMany,
 } from 'typeorm';
 
 import User from '@modules/users/infra/typeorm/entities/User';
@@ -23,6 +24,13 @@ class Appointment {
   @ManyToOne(() => User)
   @JoinColumn({ name: 'provider_id' })
   provider: User;
+
+  @Column()
+  user_id: string;
+
+  @ManyToMany(() => User)
+  @JoinColumn({ name: 'user_id' })
+  user: User;
 
   @Column('timestamp with time zone')
   date: Date;

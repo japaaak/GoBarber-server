@@ -1,4 +1,4 @@
-// src/database/index.ts
-import { createConnection } from 'typeorm';
+// src\shared\infra\typeorm\index.ts
+import { createConnections } from 'typeorm';
 
-createConnection();
+createConnections();
